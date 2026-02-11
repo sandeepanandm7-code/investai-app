@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Stock Analysis - Complete Fundamentals</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f2e 100%);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.1));
+      border-radius: 24px;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .api-setup {
+      background: rgba(0,0,0,0.3);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .api-card {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .api-card h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 12px 18px;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+    }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .status.success { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+    .status.error { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); }
+    .status.info { background: rgba(102, 126, 234, 0.2); color: #667eea; border: 1px solid rgba(102, 126, 234, 0.3); }
+
+    .search-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .search-box {
+      display: flex;
+      gap: 15px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 18px 25px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 15px;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .search-box button {
+      padding: 18px 40px;
+      font-size: 1.1rem;
+    }
+
+    .overview-section {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.05));
+      border-radius: 24px;
+      padding: 35px;
+      margin-bottom: 30px;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .stock-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stock-symbol {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #a8b2d1;
+    }
+
+    .stock-name {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 5px;
+    }
+
+    .price-display {
+      text-align: right;
+    }
+
+    .current-price {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #667eea;
+      line-height: 1;
+    }
+
+    .price-change {
+      font-size: 1.3rem;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .positive { color: #2ed573; }
+    .negative { color: #ff6b6b; }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    .metric-box {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #a8b2d1;
+    }
+
+    .chart-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .chart-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #a8b2d1;
+    }
+
+    .time-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .time-btn {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .time-btn:hover, .time-btn.active {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.2));
+      border-color: #667eea;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 450px;
+      margin-top: 20px;
+    }
+
+    .tabs-section {
+      margin-bottom: 30px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 15px 25px;
+      background: rgba(255,255,255,0.03);
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .tab:hover, .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .tab-content {
+      display: none;
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      padding: 30px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .data-table th {
+      background: rgba(102, 126, 234, 0.15);
+      color: #a8b2d1;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .data-table td {
+      color: rgba(255,255,255,0.85);
+      font-size: 1rem;
+    }
+
+    .data-table tr:hover {
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    .data-table .highlight {
+      background: rgba(102, 126, 234, 0.1);
+      font-weight: 600;
+    }
+
+    .ratio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .ratio-card {
+      background: rgba(255,255,255,0.03);
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .ratio-card h4 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ratio-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .ratio-item:last-child {
+      border-bottom: none;
+    }
+
+    .ratio-label {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .ratio-value {
+      color: #a8b2d1;
+      font-weight: 600;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(102, 126, 234, 0.2);
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-box {
+      background: rgba(255, 107, 107, 0.15);
+      border: 2px solid #ff6b6b;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      color: #ff6b6b;
+    }
+
+    .cache-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(46, 213, 115, 0.2);
+      border: 1px solid rgba(46, 213, 115, 0.4);
+      border-radius: 12px;
+      font-size: 0.75rem;
+      color: #2ed573;
+      margin-left: 10px;
+    }
+
+    .info-box {
+      background: rgba(102, 126, 234, 0.1);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      line-height: 1.7;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .stock-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .price-display {
+        text-align: left;
+      }
+      .api-grid {
+        grid-template-columns: 1fr;
+      }
+      .tabs {
+        overflow-x: scroll;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>📊 Professional Stock Analysis</h1>
+      <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-top: 10px;">
+        Complete Fundamental Analysis • Charts • Financial Statements • Ratios • Valuation
+      </p>
+    </div>
+
+    <!-- API Configuration -->
+    <div class="api-setup">
+      <h2 style="color: #a8b2d1; margin-bottom: 20px;">🔑 API Configuration</h2>
+      
+      <div class="api-grid">
+        <div class="api-card">
+          <h3>Polygon.io (Charts)</h3>
+          <div class="input-group">
+            <input type="password" id="polygonKey" placeholder="Polygon.io API key">
+            <button class="btn btn-small" onclick="savePolygonKey()">Save</button>
+            <button class="btn btn-small" onclick="testPolygonKey()">Test</button>
+          </div>
+          <div id="polygonStatus"></div>
+          <div class="info-box" style="margin-top: 10px;">
+            <a href="https://polygon.io/dashboard/signup" target="_blank" style="color: #667eea;">Get free key →</a> Unlimited calls (5/min)
+          </div>
+        </div>
+
+        <div class="api-card">
+          <h3>Twelve Data (Quotes & Stats)</h3>
+          <div class="input-group">
+            <input type="password" id="twelveKey" placeholder="Twelve Data API key" value="c1b9de0217eb4d1ebb05539d7fc6a2e4">
+            <button class="btn btn-small" onclick="saveTwelveKey()">Save</button>
+            <button class="btn btn-small" onclick="testTwelveKey()">Test</button>
+          </div>
+          <div id="twelveStatus"></div>
+          <div class="info-box" style="margin-top: 10px;">
+            <a href="https://twelvedata.com/pricing" target="_blank" style="color: #667eea;">Get free key →</a> 800 calls/day
+          </div>
+        </div>
+
+        <div class="api-card">
+          <h3>Yahoo Finance (Fundamentals)</h3>
+          <div class="input-group">
+            <input type="password" id="yahooKey" placeholder="RapidAPI Key (optional)" disabled>
+            <button class="btn btn-small" style="opacity: 0.5;" disabled>Info</button>
+          </div>
+          <div class="info-box" style="margin-top: 10px; background: rgba(46, 213, 115, 0.1); border-color: rgba(46, 213, 115, 0.3);">
+            ✅ Using free Yahoo Finance API (no key needed!)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-section">
+      <h2 style="text-align: center; margin-bottom: 20px; color: #a8b2d1;">🔍 Analyze Any Stock</h2>
+      <div class="search-box">
+        <input type="text" id="symbolInput" placeholder="Enter symbol (AAPL, TSLA, MSFT, GOOGL, AMZN, META...)..." onkeypress="if(event.key==='Enter') analyzeStock()">
+        <button class="btn" onclick="analyzeStock()">Analyze</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" style="display: none;">
+      <!-- Overview -->
+      <div class="overview-section">
+        <div class="stock-title-row">
+          <div>
+            <div class="stock-symbol" id="stockSymbol"></div>
+            <div class="stock-name" id="stockName"></div>
+            <div style="margin-top: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.5);" id="stockExchange"></div>
+          </div>
+          <div class="price-display">
+            <div class="current-price" id="currentPrice"></div>
+            <div class="price-change" id="priceChange"></div>
+          </div>
+        </div>
+        <div class="metrics-grid" id="metricsGrid"></div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title">📈 Price Chart</div>
+          <div class="time-selector">
+            <button class="time-btn" onclick="changeTimeRange('1D')">1D</button>
+            <button class="time-btn active" onclick="changeTimeRange('1W')">1W</button>
+            <button class="time-btn" onclick="changeTimeRange('1M')">1M</button>
+            <button class="time-btn" onclick="changeTimeRange('3M')">3M</button>
+            <button class="time-btn" onclick="changeTimeRange('1Y')">1Y</button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Fundamental Analysis Tabs -->
+      <div class="tabs-section">
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('overview')">📊 Overview</button>
+          <button class="tab" onclick="switchTab('financials')">💰 Financials</button>
+          <button class="tab" onclick="switchTab('ratios')">📈 Ratios</button>
+          <button class="tab" onclick="switchTab('valuation')">💎 Valuation</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+          <h3 style="color: #a8b2d1; margin-bottom: 20px;">📊 Company Overview & Key Metrics</h3>
+          <div id="overviewContent"></div>
+        </div>
+
+        <!-- Financials Tab -->
+        <div id="financials-tab" class="tab-content">
+          <h3 style="color: #a8b2d1; margin-bottom: 20px;">💰 Financial Performance</h3>
+          <div id="financialsContent"></div>
+        </div>
+
+        <!-- Ratios Tab -->
+        <div id="ratios-tab" class="tab-content">
+          <h3 style="color: #a8b2d1; margin-bottom: 20px;">📈 Financial Ratios Analysis</h3>
+          <div id="ratiosContent"></div>
+        </div>
+
+        <!-- Valuation Tab -->
+        <div id="valuation-tab" class="tab-content">
+          <h3 style="color: #a8b2d1; margin-bottom: 20px;">💎 Valuation Metrics</h3>
+          <div id="valuationContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p style="font-size: 1.2rem; color: #667eea;">Fetching comprehensive analysis...</p>
+      <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 10px;">
+        Loading financial statements, ratios, and valuation metrics
+      </p>
+    </div>
+
+    <!-- Error -->
+    <div id="errorBox"></div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    
+    let polygonKey = localStorage.getItem('polygon_key') || '';
+    let twelveKey = localStorage.getItem('twelve_key') || 'c1b9de0217eb4d1ebb05539d7fc6a2e4';
+    let currentSymbol = '';
+    let currentTimeRange = '1W';
+    let priceChart = null;
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      if (polygonKey) {
+        document.getElementById('polygonKey').value = polygonKey;
+        showStatus('polygonStatus', '✅ Loaded', 'success');
+      }
+      if (twelveKey) {
+        document.getElementById('twelveKey').value = twelveKey;
+        showStatus('twelveStatus', '✅ Pre-filled', 'success');
+      }
+    });
+
+    // ==========================================
+    // API KEY MANAGEMENT
+    // ==========================================
+    
+    function savePolygonKey() {
+      polygonKey = document.getElementById('polygonKey').value.trim();
+      if (!polygonKey) {
+        showStatus('polygonStatus', '❌ Enter key', 'error');
+        return;
+      }
+      localStorage.setItem('polygon_key', polygonKey);
+      showStatus('polygonStatus', '✅ Saved', 'success');
+    }
+
+    function saveTwelveKey() {
+      twelveKey = document.getElementById('twelveKey').value.trim();
+      if (!twelveKey) {
+        showStatus('twelveStatus', '❌ Enter key', 'error');
+        return;
+      }
+      localStorage.setItem('twelve_key', twelveKey);
+      showStatus('twelveStatus', '✅ Saved', 'success');
+    }
+
+    async function testPolygonKey() {
+      if (!polygonKey) {
+        showStatus('polygonStatus', '❌ Save first', 'error');
+        return;
+      }
+      showStatus('polygonStatus', '🔄 Testing...', 'info');
+      try {
+        const res = await fetch(`https://api.polygon.io/v3/reference/tickers/AAPL?apiKey=${polygonKey}`);
+        const data = await res.json();
+        if (data.status === 'OK') showStatus('polygonStatus', '✅ Valid!', 'success');
+        else showStatus('polygonStatus', '❌ Invalid', 'error');
+      } catch (e) {
+        showStatus('polygonStatus', '❌ Error', 'error');
+      }
+    }
+
+    async function testTwelveKey() {
+      if (!twelveKey) {
+        showStatus('twelveStatus', '❌ Save first', 'error');
+        return;
+      }
+      showStatus('twelveStatus', '🔄 Testing...', 'info');
+      try {
+        const res = await fetch(`https://api.twelvedata.com/quote?symbol=AAPL&apikey=${twelveKey}`);
+        const data = await res.json();
+        if (data.symbol) showStatus('twelveStatus', '✅ Valid!', 'success');
+        else showStatus('twelveStatus', '❌ Invalid', 'error');
+      } catch (e) {
+        showStatus('twelveStatus', '❌ Error', 'error');
+      }
+    }
+
+    function showStatus(id, msg, type) {
+      document.getElementById(id).innerHTML = `<div class="status ${type}">${msg}</div>`;
+    }
+
+    // ==========================================
+    // MAIN ANALYSIS
+    // ==========================================
+    
+    async function analyzeStock() {
+      const symbol = document.getElementById('symbolInput').value.trim().toUpperCase();
+      
+      if (!symbol) {
+        showError('Please enter a stock symbol');
+        return;
+      }
+      
+      if (!polygonKey || !twelveKey) {
+        showError('Please configure Polygon.io and Twelve Data API keys');
+        return;
+      }
+      
+      currentSymbol = symbol;
+      showLoading(true);
+      hideError();
+      
+      try {
+        // Fetch all data
+        const [quote, stats, fundamentals] = await Promise.all([
+          fetchTwelveQuote(symbol),
+          fetchTwelveStats(symbol),
+          fetchYahooFundamentals(symbol)
+        ]);
+        
+        // Display
+        displayOverview(quote, fundamentals);
+        displayOverviewTab(fundamentals);
+        displayFinancials(fundamentals);
+        displayRatios(fundamentals);
+        displayValuation(fundamentals, quote);
+        
+        // Chart
+        await fetchChartData(symbol, currentTimeRange);
+        
+        document.getElementById('mainContent').style.display = 'block';
+        showLoading(false);
+        
+      } catch (e) {
+        showLoading(false);
+        showError(e.message);
+        console.error(e);
+      }
+    }
+
+    // ==========================================
+    // API CALLS
+    // ==========================================
+    
+    async function fetchTwelveQuote(symbol) {
+      const res = await fetch(`https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${twelveKey}`);
+      const data = await res.json();
+      if (!data.symbol) throw new Error('Symbol not found');
+      return data;
+    }
+
+    async function fetchTwelveStats(symbol) {
+      const res = await fetch(`https://api.twelvedata.com/statistics?symbol=${symbol}&apikey=${twelveKey}`);
+      const data = await res.json();
+      return data.statistics || {};
+    }
+
+    async function fetchYahooFundamentals(symbol) {
+      // Using Yahoo Finance v11 API (free, no key needed)
+      const res = await fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=summaryDetail,financialData,defaultKeyStatistics,calendarEvents,incomeStatementHistory,balanceSheetHistory,cashflowStatementHistory,earningsHistory,earnings`);
+      const data = await res.json();
+      
+      if (!data.quoteSummary || !data.quoteSummary.result) {
+        throw new Error('Unable to fetch fundamental data');
+      }
+      
+      return data.quoteSummary.result[0];
+    }
+
+    async function fetchChartData(symbol, range) {
+      const dateRange = getDateRange(range);
+      const timespan = range === '1D' ? 'minute' : 'day';
+      const multiplier = range === '1D' ? 5 : 1;
+      
+      try {
+        const res = await fetch(
+          `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/${multiplier}/${timespan}/${dateRange.from}/${dateRange.to}?adjusted=true&sort=asc&limit=5000&apiKey=${polygonKey}`
+        );
+        const data = await res.json();
+        
+        if (data.results && data.results.length > 0) {
+          displayChart(data.results);
+        }
+      } catch (e) {
+        console.error('Chart error:', e);
+      }
+    }
+
+    function getDateRange(range) {
+      const today = new Date();
+      const from = new Date();
+      switch(range) {
+        case '1D': from.setDate(today.getDate() - 1); break;
+        case '1W': from.setDate(today.getDate() - 7); break;
+        case '1M': from.setMonth(today.getMonth() - 1); break;
+        case '3M': from.setMonth(today.getMonth() - 3); break;
+        case '1Y': from.setFullYear(today.getFullYear() - 1); break;
+      }
+      return {
+        from: from.toISOString().split('T')[0],
+        to: today.toISOString().split('T')[0]
+      };
+    }
+
+    // ==========================================
+    // DISPLAY FUNCTIONS
+    // ==========================================
+    
+    function displayOverview(quote, fundamentals) {
+      const summaryDetail = fundamentals.summaryDetail || {};
+      
+      document.getElementById('stockSymbol').textContent = quote.symbol;
+      document.getElementById('stockName').textContent = quote.name || '';
+      document.getElementById('stockExchange').textContent = quote.exchange || '';
+      
+      const price = parseFloat(quote.close);
+      document.getElementById('currentPrice').textContent = `$${price.toFixed(2)}`;
+      
+      const change = parseFloat(quote.change);
+      const changePercent = parseFloat(quote.percent_change);
+      const changeClass = change >= 0 ? 'positive' : 'negative';
+      const changeSymbol = change >= 0 ? '▲' : '▼';
+      
+      document.getElementById('priceChange').innerHTML = `
+        <span class="${changeClass}">
+          ${changeSymbol} $${Math.abs(change).toFixed(2)} (${Math.abs(changePercent).toFixed(2)}%)
+        </span>
+      `;
+      
+      const metrics = [
+        { label: 'Open', value: quote.open ? `$${parseFloat(quote.open).toFixed(2)}` : 'N/A' },
+        { label: 'High', value: quote.high ? `$${parseFloat(quote.high).toFixed(2)}` : 'N/A' },
+        { label: 'Low', value: quote.low ? `$${parseFloat(quote.low).toFixed(2)}` : 'N/A' },
+        { label: 'Volume', value: quote.volume ? parseInt(quote.volume).toLocaleString() : 'N/A' },
+        { label: 'Market Cap', value: summaryDetail.marketCap ? formatLarge(summaryDetail.marketCap.raw) : 'N/A' },
+        { label: 'P/E Ratio', value: summaryDetail.trailingPE ? summaryDetail.trailingPE.fmt : 'N/A' },
+        { label: '52W High', value: quote.fifty_two_week?.high ? `$${parseFloat(quote.fifty_two_week.high).toFixed(2)}` : 'N/A' },
+        { label: '52W Low', value: quote.fifty_two_week?.low ? `$${parseFloat(quote.fifty_two_week.low).toFixed(2)}` : 'N/A' }
+      ];
+      
+      document.getElementById('metricsGrid').innerHTML = metrics.map(m => `
+        <div class="metric-box">
+          <div class="metric-label">${m.label}</div>
+          <div class="metric-value">${m.value}</div>
+        </div>
+      `).join('');
+    }
+
+    function displayOverviewTab(fundamentals) {
+      const summary = fundamentals.summaryDetail || {};
+      const financial = fundamentals.financialData || {};
+      const keyStats = fundamentals.defaultKeyStatistics || {};
+      
+      const overviewData = [
+        ['Market Cap', summary.marketCap ? formatLarge(summary.marketCap.raw) : 'N/A'],
+        ['Enterprise Value', keyStats.enterpriseValue ? formatLarge(keyStats.enterpriseValue.raw) : 'N/A'],
+        ['Trailing P/E', summary.trailingPE ? summary.trailingPE.fmt : 'N/A'],
+        ['Forward P/E', summary.forwardPE ? summary.forwardPE.fmt : 'N/A'],
+        ['PEG Ratio', keyStats.pegRatio ? keyStats.pegRatio.fmt : 'N/A'],
+        ['Price to Book', keyStats.priceToBook ? keyStats.priceToBook.fmt : 'N/A'],
+        ['Price to Sales', keyStats.priceToSalesTrailing12Months ? keyStats.priceToSalesTrailing12Months.fmt : 'N/A'],
+        ['EV to Revenue', keyStats.enterpriseToRevenue ? keyStats.enterpriseToRevenue.fmt : 'N/A'],
+        ['EV to EBITDA', keyStats.enterpriseToEbitda ? keyStats.enterpriseToEbitda.fmt : 'N/A'],
+        ['Beta', keyStats.beta ? keyStats.beta.fmt : 'N/A'],
+        ['52-Week Change', keyStats.['52WeekChange'] ? (keyStats.['52WeekChange'].fmt || 'N/A') : 'N/A'],
+        ['Shares Outstanding', keyStats.sharesOutstanding ? formatLarge(keyStats.sharesOutstanding.raw) : 'N/A'],
+        ['Float Shares', keyStats.floatShares ? formatLarge(keyStats.floatShares.raw) : 'N/A'],
+        ['% Held by Insiders', keyStats.heldPercentInsiders ? keyStats.heldPercentInsiders.fmt : 'N/A'],
+        ['% Held by Institutions', keyStats.heldPercentInstitutions ? keyStats.heldPercentInstitutions.fmt : 'N/A'],
+        ['Short Ratio', keyStats.shortRatio ? keyStats.shortRatio.fmt : 'N/A'],
+        ['Dividend Rate', summary.dividendRate ? summary.dividendRate.fmt : 'N/A'],
+        ['Dividend Yield', summary.dividendYield ? summary.dividendYield.fmt : 'N/A'],
+        ['Payout Ratio', keyStats.payoutRatio ? keyStats.payoutRatio.fmt : 'N/A'],
+        ['Ex-Dividend Date', summary.exDividendDate ? new Date(summary.exDividendDate.raw * 1000).toLocaleDateString() : 'N/A']
+      ];
+      
+      document.getElementById('overviewContent').innerHTML = `
+        <table class="data-table">
+          <tr><th>Metric</th><th>Value</th></tr>
+          ${overviewData.map(([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`).join('')}
+        </table>
+      `;
+    }
+
+    function displayFinancials(fundamentals) {
+      const financial = fundamentals.financialData || {};
+      
+      const financialData = [
+        ['Revenue (TTM)', financial.totalRevenue ? formatLarge(financial.totalRevenue.raw) : 'N/A'],
+        ['Revenue Per Share', financial.revenuePerShare ? financial.revenuePerShare.fmt : 'N/A'],
+        ['Revenue Growth', financial.revenueGrowth ? financial.revenueGrowth.fmt : 'N/A'],
+        ['Gross Profit', financial.grossProfits ? formatLarge(financial.grossProfits.raw) : 'N/A'],
+        ['EBITDA', financial.ebitda ? formatLarge(financial.ebitda.raw) : 'N/A'],
+        ['Operating Margin', financial.operatingMargins ? financial.operatingMargins.fmt : 'N/A'],
+        ['Profit Margin', financial.profitMargins ? financial.profitMargins.fmt : 'N/A'],
+        ['Gross Margin', financial.grossMargins ? financial.grossMargins.fmt : 'N/A'],
+        ['EBITDA Margin', financial.ebitdaMargins ? financial.ebitdaMargins.fmt : 'N/A'],
+        ['Operating Cash Flow', financial.operatingCashflow ? formatLarge(financial.operatingCashflow.raw) : 'N/A'],
+        ['Free Cash Flow', financial.freeCashflow ? formatLarge(financial.freeCashflow.raw) : 'N/A'],
+        ['Total Cash', financial.totalCash ? formatLarge(financial.totalCash.raw) : 'N/A'],
+        ['Total Cash Per Share', financial.totalCashPerShare ? financial.totalCashPerShare.fmt : 'N/A'],
+        ['Total Debt', financial.totalDebt ? formatLarge(financial.totalDebt.raw) : 'N/A'],
+        ['Debt to Equity', financial.debtToEquity ? financial.debtToEquity.fmt : 'N/A'],
+        ['Current Ratio', financial.currentRatio ? financial.currentRatio.fmt : 'N/A'],
+        ['Quick Ratio', financial.quickRatio ? financial.quickRatio.fmt : 'N/A']
+      ];
+      
+      document.getElementById('financialsContent').innerHTML = `
+        <table class="data-table">
+          <tr><th>Financial Metric</th><th>Value</th></tr>
+          ${financialData.map(([label, value], i) => {
+            const highlight = [0, 3, 4, 9, 10].includes(i) ? 'highlight' : '';
+            return `<tr class="${highlight}"><td>${label}</td><td>${value}</td></tr>`;
+          }).join('')}
+        </table>
+      `;
+    }
+
+    function displayRatios(fundamentals) {
+      const financial = fundamentals.financialData || {};
+      const keyStats = fundamentals.defaultKeyStatistics || {};
+      
+      const profitability = [
+        ['Profit Margin', financial.profitMargins?.fmt || 'N/A'],
+        ['Operating Margin', financial.operatingMargins?.fmt || 'N/A'],
+        ['Gross Margin', financial.grossMargins?.fmt || 'N/A'],
+        ['EBITDA Margin', financial.ebitdaMargins?.fmt || 'N/A'],
+        ['Return on Assets (ROA)', financial.returnOnAssets?.fmt || 'N/A'],
+        ['Return on Equity (ROE)', financial.returnOnEquity?.fmt || 'N/A']
+      ];
+      
+      const liquidity = [
+        ['Current Ratio', financial.currentRatio?.fmt || 'N/A'],
+        ['Quick Ratio', financial.quickRatio?.fmt || 'N/A'],
+        ['Total Cash Per Share', financial.totalCashPerShare?.fmt || 'N/A']
+      ];
+      
+      const leverage = [
+        ['Debt to Equity', financial.debtToEquity?.fmt || 'N/A'],
+        ['Total Debt', financial.totalDebt ? formatLarge(financial.totalDebt.raw) : 'N/A']
+      ];
+      
+      const efficiency = [
+        ['Revenue Per Share', financial.revenuePerShare?.fmt || 'N/A'],
+        ['Revenue Growth', financial.revenueGrowth?.fmt || 'N/A'],
+        ['Earnings Growth', financial.earningsGrowth?.fmt || 'N/A']
+      ];
+      
+      document.getElementById('ratiosContent').innerHTML = `
+        <div class="ratio-grid">
+          <div class="ratio-card">
+            <h4>💎 Profitability Ratios</h4>
+            ${profitability.map(([label, value]) => `
+              <div class="ratio-item">
+                <span class="ratio-label">${label}</span>
+                <span class="ratio-value">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="ratio-card">
+            <h4>💧 Liquidity Ratios</h4>
+            ${liquidity.map(([label, value]) => `
+              <div class="ratio-item">
+                <span class="ratio-label">${label}</span>
+                <span class="ratio-value">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="ratio-card">
+            <h4>⚖️ Leverage Ratios</h4>
+            ${leverage.map(([label, value]) => `
+              <div class="ratio-item">
+                <span class="ratio-label">${label}</span>
+                <span class="ratio-value">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="ratio-card">
+            <h4>⚡ Efficiency Metrics</h4>
+            ${efficiency.map(([label, value]) => `
+              <div class="ratio-item">
+                <span class="ratio-label">${label}</span>
+                <span class="ratio-value">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function displayValuation(fundamentals, quote) {
+      const summary = fundamentals.summaryDetail || {};
+      const keyStats = fundamentals.defaultKeyStatistics || {};
+      
+      const valuationData = [
+        ['Current Price', `$${parseFloat(quote.close).toFixed(2)}`],
+        ['Market Cap', summary.marketCap ? formatLarge(summary.marketCap.raw) : 'N/A'],
+        ['Enterprise Value', keyStats.enterpriseValue ? formatLarge(keyStats.enterpriseValue.raw) : 'N/A'],
+        ['Trailing P/E', summary.trailingPE?.fmt || 'N/A'],
+        ['Forward P/E', summary.forwardPE?.fmt || 'N/A'],
+        ['PEG Ratio', keyStats.pegRatio?.fmt || 'N/A'],
+        ['Price to Book', keyStats.priceToBook?.fmt || 'N/A'],
+        ['Price to Sales (TTM)', keyStats.priceToSalesTrailing12Months?.fmt || 'N/A'],
+        ['EV to Revenue', keyStats.enterpriseToRevenue?.fmt || 'N/A'],
+        ['EV to EBITDA', keyStats.enterpriseToEbitda?.fmt || 'N/A'],
+        ['Book Value Per Share', keyStats.bookValue?.fmt || 'N/A'],
+        ['Earnings Per Share (EPS)', keyStats.trailingEps?.fmt || 'N/A'],
+        ['Forward EPS', summary.forwardEps?.fmt || 'N/A']
+      ];
+      
+      document.getElementById('valuationContent').innerHTML = `
+        <table class="data-table">
+          <tr><th>Valuation Metric</th><th>Value</th></tr>
+          ${valuationData.map(([label, value], i) => {
+            const highlight = [1, 2, 3, 5, 9].includes(i) ? 'highlight' : '';
+            return `<tr class="${highlight}"><td>${label}</td><td>${value}</td></tr>`;
+          }).join('')}
+        </table>
+      `;
+    }
+
+    function displayChart(results) {
+      const dates = results.map(r => new Date(r.t));
+      const prices = results.map(r => r.c);
+      
+      if (priceChart) priceChart.destroy();
+      
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Price',
+            data: prices,
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#667eea',
+            pointHoverBorderColor: 'white',
+            pointHoverBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#a8b2d1',
+              bodyColor: 'white',
+              borderColor: '#667eea',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: (ctx) => '$' + ctx.parsed.y.toFixed(2)
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: getTimeUnit(currentTimeRange) },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' },
+              ticks: { color: 'rgba(255, 255, 255, 0.6)' }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.1)' },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)',
+                callback: (val) => '$' + val.toFixed(2)
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function getTimeUnit(range) {
+      const units = { '1D': 'hour', '1W': 'day', '1M': 'day', '3M': 'week', '1Y': 'month' };
+      return units[range] || 'day';
+    }
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    
+    function formatLarge(num) {
+      if (!num && num !== 0) return 'N/A';
+      if (num >= 1e12) return `$${(num / 1e12).toFixed(2)}T`;
+      if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
+      if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
+      return `$${num.toLocaleString()}`;
+    }
+
+    function changeTimeRange(range) {
+      currentTimeRange = range;
+      document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      if (currentSymbol) fetchChartData(currentSymbol, range);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').style.display = show ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      document.getElementById('errorBox').innerHTML = `<div class="error-box"><strong>❌ Error:</strong> ${msg}</div>`;
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
